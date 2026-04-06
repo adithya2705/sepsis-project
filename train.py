@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
@@ -10,22 +9,28 @@ import os
 data = pd.read_csv("Dataset.csv")
 data.columns = data.columns.str.strip()
 
-print("Before cleaning:", data.shape)
+# Remove unwanted column
+data = data.drop(columns=["Unnamed: 0"], errors='ignore')
 
 # Fill missing values
 data = data.fillna(0)
 
-print("After cleaning:", data.shape)
+# Selected important features
+selected_features = [
+    'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'Resp',
+    'pH', 'WBC', 'Lactate', 'Creatinine',
+    'Platelets', 'Age'
+]
 
-# Split features and target
-X = data.drop("SepsisLabel", axis=1)
+# Features and target
+X = data[selected_features]
 y = data["SepsisLabel"]
 
-# SAVE FEATURE NAMES 🔥
+# Save feature names
 if not os.path.exists("models"):
     os.makedirs("models")
 
-pickle.dump(list(X.columns), open("models/features.pkl", "wb"))
+pickle.dump(selected_features, open("models/features.pkl", "wb"))
 
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
@@ -44,4 +49,4 @@ model.fit(X_train, y_train)
 # Save model
 pickle.dump(model, open("models/xgb_model.pkl", "wb"))
 
-print("Model trained and saved successfully!")
+print("✅ Model trained with selected features!")
