@@ -10,16 +10,20 @@ st.set_page_config(page_title="Sepsis Prediction", layout="centered")
 
 st.title("🏥 ICU Sepsis Early Warning System")
 
-st.write("Enter key patient parameters:")
+st.write("Enter patient details:")
 
-# Input fields
 input_data = []
 
 for feature in feature_names:
-    val = st.number_input(feature, value=0.0)
+    if feature == "Gender":
+        val = st.selectbox("Gender", ["Male", "Female"])
+        val = 1 if val == "Male" else 0
+    else:
+        val = st.number_input(feature, value=0.0)
+    
     input_data.append(val)
 
-# Predict button
+# Predict
 if st.button("🔍 Predict"):
     data = np.array(input_data).reshape(1, -1)
 

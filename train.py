@@ -15,11 +15,11 @@ data = data.drop(columns=["Unnamed: 0"], errors='ignore')
 # Fill missing values
 data = data.fillna(0)
 
-# Selected important features
+# Selected features (including Gender)
 selected_features = [
     'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'Resp',
     'pH', 'WBC', 'Lactate', 'Creatinine',
-    'Platelets', 'Age'
+    'Platelets', 'Age', 'Gender'
 ]
 
 # Features and target
@@ -49,4 +49,4 @@ model.fit(X_train, y_train)
 # Save model
 pickle.dump(model, open("models/xgb_model.pkl", "wb"))
 
-print("✅ Model trained with selected features!")
+print("✅ Model trained with Gender included!")
