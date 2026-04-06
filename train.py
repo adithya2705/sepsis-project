@@ -47,7 +47,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ==============================
-# Scaling (VERY IMPORTANT 🔥)
+# Scaling (IMPORTANT)
 # ==============================
 scaler = StandardScaler()
 
@@ -58,12 +58,20 @@ X_test = scaler.transform(X_test)
 pickle.dump(scaler, open("models/scaler.pkl", "wb"))
 
 # ==============================
-# Train model
+# Train model (BALANCED 🔥)
 # ==============================
-model = XGBClassifier(n_estimators=100, max_depth=5, learning_rate=0.1)
+model = XGBClassifier(
+    n_estimators=100,
+    max_depth=5,
+    learning_rate=0.1,
+    scale_pos_weight=10   # 🔥 IMPORTANT FIX
+)
+
 model.fit(X_train, y_train)
 
+# ==============================
 # Save model
+# ==============================
 pickle.dump(model, open("models/xgb_model.pkl", "wb"))
 
-print("✅ Model trained with scaling + selected features!")
+print("✅ Model trained with scaling + imbalance fix!")
