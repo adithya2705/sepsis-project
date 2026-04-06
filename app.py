@@ -6,12 +6,13 @@ import numpy as np
 model = pickle.load(open("models/xgb_model.pkl", "rb"))
 feature_names = pickle.load(open("models/features.pkl", "rb"))
 
+# Page setup
 st.set_page_config(page_title="Sepsis Prediction", layout="centered")
 
 st.title("🏥 ICU Sepsis Early Warning System")
-
 st.write("Enter patient details:")
 
+# Input fields
 input_data = []
 
 for feature in feature_names:
@@ -23,7 +24,7 @@ for feature in feature_names:
     
     input_data.append(val)
 
-# Predict
+# Prediction section
 if st.button("🔍 Predict"):
     data = np.array(input_data).reshape(1, -1)
 
@@ -33,9 +34,12 @@ if st.button("🔍 Predict"):
     st.subheader("Result")
 
     if prediction[0] == 1:
-        st.error("⚠️ High Risk of Sepsis")
+        st.error("⚠️ High Risk of Sepsis - Immediate Attention Required!")
     else:
-        st.success("✅ Low Risk")
+        st.success("✅ Patient is Stable (Low Risk)")
 
-    st.progress(probability)
+    # ✅ FIXED PROGRESS BAR
+    st.progress(float(probability))
+
+    # Show percentage
     st.write(f"Sepsis Probability: {probability*100:.1f}%")
