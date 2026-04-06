@@ -2,17 +2,24 @@ import streamlit as st
 import pickle
 import numpy as np
 
-# Load model and features
+# ==============================
+# Load model, features, scaler
+# ==============================
 model = pickle.load(open("models/xgb_model.pkl", "rb"))
 feature_names = pickle.load(open("models/features.pkl", "rb"))
+scaler = pickle.load(open("models/scaler.pkl", "rb"))  # 🔥 NEW
 
+# ==============================
 # Page setup
+# ==============================
 st.set_page_config(page_title="Sepsis Prediction", layout="centered")
 
 st.title("🏥 ICU Sepsis Early Warning System")
 st.write("Enter patient details:")
 
+# ==============================
 # Input fields
+# ==============================
 input_data = []
 
 for feature in feature_names:
@@ -24,9 +31,14 @@ for feature in feature_names:
     
     input_data.append(val)
 
-# Prediction section
+# ==============================
+# Prediction
+# ==============================
 if st.button("🔍 Predict"):
     data = np.array(input_data).reshape(1, -1)
+
+    # 🔥 APPLY SCALING (IMPORTANT FIX)
+    data = scaler.transform(data)
 
     prediction = model.predict(data)
     probability = model.predict_proba(data)[0][1]
@@ -38,7 +50,7 @@ if st.button("🔍 Predict"):
     else:
         st.success("✅ Patient is Stable (Low Risk)")
 
-    # ✅ FIXED PROGRESS BAR
+    # Progress bar (fixed)
     st.progress(float(probability))
 
     # Show percentage
