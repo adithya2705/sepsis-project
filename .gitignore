@@ -1,5 +1,2 @@
 Dataset.csv
-models/
 __pycache__/
-*.pkl
-*.h5
