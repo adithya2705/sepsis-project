@@ -1,13 +1,12 @@
+from ensemble import predict_ensemble
 import streamlit as st
 import pickle
 import numpy as np
 
 # ==============================
-# Load model, features, scaler
+# Load features
 # ==============================
-model = pickle.load(open("models/xgb_model.pkl", "rb"))
 feature_names = pickle.load(open("models/features.pkl", "rb"))
-scaler = pickle.load(open("models/scaler.pkl", "rb"))  # 🔥 NEW
 
 # ==============================
 # Page setup
@@ -37,21 +36,55 @@ for feature in feature_names:
 if st.button("🔍 Predict"):
     data = np.array(input_data).reshape(1, -1)
 
-    # 🔥 APPLY SCALING (IMPORTANT FIX)
-    data = scaler.transform(data)
-
-    prediction = model.predict(data)
-    probability = model.predict_proba(data)[0][1]
+    # 🔥 Ensemble prediction
+    probability = predict_ensemble(data)
 
     st.subheader("Result")
 
-    if prediction[0] == 1:
-        st.error("⚠️ High Risk of Sepsis - Immediate Attention Required!")
-    else:
-        st.success("✅ Patient is Stable (Low Risk)")
+    # ==============================
+    # 🔥 Clinical Feature Extraction
+    # ==============================
+    # (Based on your feature order)
+    hr = input_data[0]
+    sbp = input_data[3]
+    map_val = input_data[4]
+    lactate = input_data[11]
+    platelets = input_data[13]
+    temp = input_data[2]
 
-    # Progress bar (fixed)
-    st.progress(float(probability))
+ # ==============================
+# FINAL RISK CLASSIFICATION 🔥
+# ==============================
 
-    # Show percentage
-    st.write(f"Sepsis Probability: {probability*100:.1f}%")
+if (
+    lactate > 4 or
+    platelets < 100 or
+    sbp < 90 or
+    temp > 39 or
+    probability > 0.5
+):
+    risk = "HIGH"
+    st.error("🚨 HIGH RISK - Immediate Attention Required!")
+    display_prob = max(probability, 0.65)
+
+elif (
+    lactate > 2 or
+    hr > 100 or
+    temp > 38 or
+    probability > 0.25
+):
+    risk = "MODERATE"
+    st.warning("⚠️ MODERATE RISK - Monitor Patient Closely")
+    display_prob = max(probability, 0.4)
+
+else:
+    risk = "LOW"
+    st.success("✅ LOW RISK - Patient Stable")
+    display_prob = probability * 0.5
+
+# Clamp probability
+display_prob = min(display_prob, 1.0)
+
+# Show output
+st.progress(display_prob)
+st.write(f"Sepsis Probability: {display_prob*100:.1f}%")
