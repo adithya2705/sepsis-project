@@ -15,7 +15,7 @@ def predict_ensemble(input_data):
 
     # LSTM
     lstm_input = lstm_scaler.transform(input_data)
-    lstm_input = lstm_input.reshape(1, 1, lstm_input.shape[1])
-    lstm_prob = lstm_model.predict(lstm_input)[0][0]
+lstm_input = lstm_input.reshape(1, 1, lstm_input.shape[1])
+lstm_prob = lstm_model.predict(lstm_input)[0][0]
 
-    return (xgb_prob + lstm_prob) / 2
+return (xgb_prob + lstm_prob) / 2

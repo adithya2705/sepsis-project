@@ -1,4 +1,4 @@
-from ensemble import predict_ensemble
+from ensemble_streamlit import predict_ensemble
 import streamlit as st
 import pickle
 import numpy as np
